@@ -1,51 +1,97 @@
-
-import java.util.Scanner;
+import java.util.Random;
 
 public class Game {
-    public static int[][] GenGame(int a[][]){
-        for(int i = 0; i < 9; ++i)
-            for(int j = 0; j < 9; ++j)
-                a[i][j] = 0;
+    private static final int SIZE = 9;
+    private static final int[][] board = new int[SIZE][SIZE];
+    private static final Random rand = new Random();
 
-        Scanner ip = new Scanner(System.in);
-
-        System.out.print("Nhap so o hien thi so: ");
-        int n = ip.nextInt();
-        
-        for(int i = 0; i < n; ++i){
-            int x = RandomInt(0, 8);
-            int y = RandomInt(0, 8);
-            if(a[x][y] != 0){
-                i--;
-                continue;
-            }
-            
-            boolean c = true;
-            while(c){
-                int z = RandomInt(1, 9);
-                if(!Check.CheckRows(z, a, x) || !Check.CheckCols(z, a, y) || !Check.CheckAllZone(z, a))
-                    continue;
-                a[x][y] = z;
-                c = false;
-            }
-        }
-
-        return a;
+    public static void GenerateFullBoard() {
+        fillDiagonal(); // Điền các vùng 3x3 chéo trước để tạo cơ sở
+        solve(board); // Dùng thuật toán backtracking để tạo bảng hoàn chỉnh
     }
 
-    private static int RandomInt(int a, int b){
-        int x = (int) (Math.random() * (b - a + 1)) + a;
-        return x;
+    public static void RemoveNumbers(int level) {
+        int removeCount = switch (level) {
+            case 1 -> 40; // Dễ
+            case 2 -> 50; // Trung bình
+            case 3 -> 55; // Khó
+            case 4 -> 60; // Siêu khó
+            default -> 50;
+        };
+
+        while (removeCount > 0) {
+            int i = rand.nextInt(9);
+            int j = rand.nextInt(9);
+            if (board[i][j] != 0) {
+                int backup = board[i][j];
+                board[i][j] = 0;
+
+                if (!isUniqueSolution()) {
+                    board[i][j] = backup; // Nếu xóa số này làm Sudoku có nhiều lời giải, khôi phục lại
+                } else {
+                    removeCount--;
+                }
+            }
+        }
     }
 
-    public static void OutputLevel(int a[][]){
-        for(int i = 0; i < 9; ++i){
-            for(int j = 0; j < 9; ++j)
-                if(a[i][j] == 0)
-                    System.out.print(" * ");
-                else 
-                    System.out.print(" " + a[i][j] + " ");
-            System.out.print('\n');
+    private static void fillDiagonal() {
+        for (int i = 0; i < SIZE; i += 3) {
+            fillBlock(i, i);
         }
+    }
+
+    private static void fillBlock(int row, int col) {
+        boolean[] used = new boolean[10];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int num;
+                do {
+                    num = rand.nextInt(9) + 1;
+                } while (used[num]);
+                used[num] = true;
+                board[row + i][col + j] = num;
+            }
+        }
+    }
+
+    private static boolean solve(int[][] grid) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (grid[row][col] == 0) {
+                    for (int num = 1; num <= 9; num++) {
+                        if (Check.CheckRows(num, grid, row) &&
+                            Check.CheckCols(num, grid, col) &&
+                            Check.CheckZone(num, grid, row, col)) {
+                            grid[row][col] = num;
+                            if (solve(grid)) return true;
+                            grid[row][col] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isUniqueSolution() {
+        int[][] tempBoard = new int[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++)
+            System.arraycopy(board[i], 0, tempBoard[i], 0, SIZE);
+
+        return solve(tempBoard);
+    }
+
+    public static void OutputLevel() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++)
+                System.out.print(board[i][j] == 0 ? " * " : " " + board[i][j] + " ");
+            System.out.println();
+        }
+    }
+
+    public static int[][] getBoard(){
+        return board;
     }
 }

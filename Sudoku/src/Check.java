@@ -13,19 +13,17 @@ public class Check {
         return true;
     }
 
-    public static boolean CheckZone(int x, int a[][], int i, int j){
-        for(; i < i + 3 && i < 9; ++i)
-            for(; j < j + 3 && j < 9; ++j)
-                    if(x == a[i][j] && a[i][j] != 0)
-                        return false;
-        return true;
-    }
-
-    public static boolean CheckAllZone(int x, int a[][]){
-        for(int i = 0; i < 7; i += 3)
-            for(int j = 0; j < 7; j += 3)
-                if(!CheckZone(x, a, i ,j))
+    public static boolean CheckZone(int x, int a[][], int i, int j) {
+        int startRow = (i / 3) * 3;
+        int startCol = (j / 3) * 3;
+    
+        for (int row = startRow; row < startRow + 3; row++) {
+            for (int col = startCol; col < startCol + 3; col++) {
+                if (a[row][col] == x)
                     return false;
+            }
+        }
         return true;
     }
+    
 }
