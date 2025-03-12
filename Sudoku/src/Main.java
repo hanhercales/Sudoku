@@ -1,23 +1,42 @@
+
 import java.util.Scanner;
 
 public class Main {
-    public static void Input(int[][] a) {
-        Scanner ip = new Scanner(System.in);
-        
-        int i = 0, j = 0;
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Choose difficulty (1-Easy, 2-Normal, 3-Hard, 4-Hell): ");
+        int level = scanner.nextInt();
+
+        Game game = new Game();
+        game.GenerateFullBoard();
+        game.RemoveNumbers(level);
+        game.OutputLevel();
+
+        while (true) {
+            System.out.print("Continue playing? (y/n): ");
+            String choice = scanner.next();
+            if (choice.equalsIgnoreCase("n")) break;
+
+            playerInput(game.getBoard(), scanner);
+            game.OutputLevel();
+        }
+        System.out.println("Game Over!");
+    }
+
+    private static void playerInput(int[][] board, Scanner scanner) {
+        int row, col;
         while (true) {
             System.out.print("Input Row (0-8): ");
-            i = ip.nextInt();
+            row = scanner.nextInt();
             System.out.print("Input Column (0-8): ");
-            j = ip.nextInt();
+            col = scanner.nextInt();
 
-            if (i < 0 || i > 8 || j < 0 || j > 8) {
-                System.out.print("Invalid coordinates\n");
+            if (row < 0 || row > 8 || col < 0 || col > 8) {
+                System.out.println("Invalid coordinates");
                 continue;
             }
-
-            if (a[i][j] != 0) {
-                System.out.print("Cell already has a number!\n");
+            if (board[row][col] != 0) {
+                System.out.println("Cell already has a number!");
                 continue;
             }
             break;
@@ -25,45 +44,18 @@ public class Main {
 
         while (true) {
             System.out.print("Input value (1-9): ");
-            int x = ip.nextInt();
+            int value = scanner.nextInt();
 
-            if (x < 1 || x > 9) {
-                System.out.print("Invalid value!\n");
+            if (value < 1 || value > 9) {
+                System.out.println("Invalid value!");
                 continue;
             }
-            if (!Check.CheckRows(x, a, i) || !Check.CheckCols(x, a, j) || !Check.CheckZone(x, a, i, j)) {
-                System.out.print("Wrong value!\n");
+            if (!Check.isValidMove(value, board, row, col)) {
+                System.out.println("Wrong value!");
                 continue;
             }
-            a[i][j] = x;
+            board[row][col] = value;
             break;
         }
-    }
-
-    public static void main(String[] args) {
-        Scanner ip = new Scanner(System.in);
-
-        System.out.print("Choose dificulty (1-Easy, 2-Normal, 3-Hard, 4-Hell): ");
-        int level = ip.nextInt();
-
-        long startTime = System.currentTimeMillis();
-
-        Game.GenerateFullBoard();
-        Game.RemoveNumbers(level);
-        Game.OutputLevel();
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("Generate time: " + (endTime - startTime) + "ms");
-
-        while (true) {
-            System.out.print("Continue playing? (y/n): ");
-            String choice = ip.next();
-            if (choice.equalsIgnoreCase("n")) break;
-
-            Input(Game.getBoard());
-            Game.OutputLevel();
-        }
-
-        System.out.println("Game Over!");
     }
 }

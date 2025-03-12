@@ -2,20 +2,25 @@ import java.util.Random;
 
 public class Game {
     private static final int SIZE = 9;
-    private static final int[][] board = new int[SIZE][SIZE];
-    private static final Random rand = new Random();
+    private int[][] board;
+    private Random rand;
 
-    public static void GenerateFullBoard() {
-        fillDiagonal(); // Điền các vùng 3x3 chéo trước để tạo cơ sở
-        solve(board); // Dùng thuật toán backtracking để tạo bảng hoàn chỉnh
+    public Game() {
+        board = new int[SIZE][SIZE];
+        rand = new Random();
     }
 
-    public static void RemoveNumbers(int level) {
+    public void GenerateFullBoard() {
+        fillDiagonal();
+        solve(board);
+    }
+
+    public void RemoveNumbers(int level) {
         int removeCount = switch (level) {
-            case 1 -> 40; // Dễ
-            case 2 -> 50; // Trung bình
-            case 3 -> 55; // Khó
-            case 4 -> 60; // Siêu khó
+            case 1 -> 40;
+            case 2 -> 50;
+            case 3 -> 55;
+            case 4 -> 60;
             default -> 50;
         };
 
@@ -27,7 +32,7 @@ public class Game {
                 board[i][j] = 0;
 
                 if (!isUniqueSolution()) {
-                    board[i][j] = backup; // Nếu xóa số này làm Sudoku có nhiều lời giải, khôi phục lại
+                    board[i][j] = backup;
                 } else {
                     removeCount--;
                 }
@@ -35,13 +40,13 @@ public class Game {
         }
     }
 
-    private static void fillDiagonal() {
+    private void fillDiagonal() {
         for (int i = 0; i < SIZE; i += 3) {
             fillBlock(i, i);
         }
     }
 
-    private static void fillBlock(int row, int col) {
+    private void fillBlock(int row, int col) {
         boolean[] used = new boolean[10];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -55,14 +60,12 @@ public class Game {
         }
     }
 
-    private static boolean solve(int[][] grid) {
+    private boolean solve(int[][] grid) {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 if (grid[row][col] == 0) {
                     for (int num = 1; num <= 9; num++) {
-                        if (Check.CheckRows(num, grid, row) &&
-                            Check.CheckCols(num, grid, col) &&
-                            Check.CheckZone(num, grid, row, col)) {
+                        if (Check.isValidMove(num, grid, row, col)) {
                             grid[row][col] = num;
                             if (solve(grid)) return true;
                             grid[row][col] = 0;
@@ -75,15 +78,14 @@ public class Game {
         return true;
     }
 
-    private static boolean isUniqueSolution() {
+    private boolean isUniqueSolution() {
         int[][] tempBoard = new int[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++)
             System.arraycopy(board[i], 0, tempBoard[i], 0, SIZE);
-
         return solve(tempBoard);
     }
 
-    public static void OutputLevel() {
+    public void OutputLevel() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++)
                 System.out.print(board[i][j] == 0 ? " * " : " " + board[i][j] + " ");
@@ -91,7 +93,7 @@ public class Game {
         }
     }
 
-    public static int[][] getBoard(){
+    public int[][] getBoard() {
         return board;
     }
 }

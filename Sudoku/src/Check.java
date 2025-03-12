@@ -1,29 +1,31 @@
 public class Check {
-    public static boolean CheckRows(int x, int a[][], int i){
-        for(int j = 0; j < 9; ++j)
-                if(x == a[i][j] && a[i][j] != 0)
-                    return false;
+    public static boolean isValidMove(int x, int[][] board, int row, int col) {
+        return CheckRows(x, board, row) && CheckCols(x, board, col) && CheckZone(x, board, row, col);
+    }
+
+    public static boolean CheckRows(int x, int[][] board, int row) {
+        for (int j = 0; j < 9; ++j)
+            if (x == board[row][j] && board[row][j] != 0)
+                return false;
         return true;
     }
 
-    public static boolean CheckCols(int x, int a[][], int j){
-        for(int i = 0; i < 9; ++i)
-                if(x == a[i][j] && a[i][j] != 0)
-                    return false;
+    public static boolean CheckCols(int x, int[][] board, int col) {
+        for (int i = 0; i < 9; ++i)
+            if (x == board[i][col] && board[i][col] != 0)
+                return false;
         return true;
     }
 
-    public static boolean CheckZone(int x, int a[][], int i, int j) {
-        int startRow = (i / 3) * 3;
-        int startCol = (j / 3) * 3;
-    
-        for (int row = startRow; row < startRow + 3; row++) {
-            for (int col = startCol; col < startCol + 3; col++) {
-                if (a[row][col] == x)
+    public static boolean CheckZone(int x, int[][] board, int row, int col) {
+        int startRow = (row / 3) * 3;
+        int startCol = (col / 3) * 3;
+        for (int i = startRow; i < startRow + 3; i++) {
+            for (int j = startCol; j < startCol + 3; j++) {
+                if (board[i][j] == x)
                     return false;
             }
         }
         return true;
     }
-    
 }
